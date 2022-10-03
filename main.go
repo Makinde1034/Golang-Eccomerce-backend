@@ -37,7 +37,8 @@ func main() {
 
 	mux := mux.NewRouter()
 
-	mux.HandleFunc("/", controllers.Register).Methods("POST")
+	mux.HandleFunc("/register", controllers.Register).Methods("POST")
+	mux.HandleFunc("/login", controllers.Login).Methods("POST")
 
 	http.ListenAndServe(":8000", mux)
 

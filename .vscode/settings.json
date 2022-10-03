@@ -1,0 +1,11 @@
+{
+      "editor.fontSize": 15,
+      "screencastMode.mouseIndicatorSize": 20,
+      "screencastMode.verticalOffset": 20,
+      "screencastMode.onlyKeyboardShortcuts": false,
+      "window.zoomLevel": -1,
+      "editor.minimap.size": "proportional",
+      "screencastMode.fontSize": 20,
+      "debug.console.fontSize": 25,
+      "terminal.integrated.fontSize": 18
+}
