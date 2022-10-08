@@ -79,19 +79,23 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	newUser.Password = hashedPassword
 
-	token, _, _ := helper.GenerateAllTokens(newUser.Email, newUser.Firstname, newUser.Lastname)
+	
 
 	newUser.Verified = false
-
+ 
 	result, err := userCollection.InsertOne(ctx, newUser)
+
 
 	if err != nil {
 		json.NewEncoder(w).Encode(er{"An error occured"})
 	}
+	token, _, _ := helper.GenerateAllTokens(newUser.Email, newUser.Firstname, newUser.Lastname,result.InsertedID)
 
 	json.NewEncoder(w).Encode(response.RegisterResponse{newUser.Firstname, newUser.Lastname, newUser.Email, token})
 
-	fmt.Println(result)
+	msg := helper.Email(newUser.Email)
+
+	fmt.Println(result.InsertedID,msg)
 
 }
 
@@ -121,7 +125,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, _, _ := helper.GenerateAllTokens(foundUser.Email, foundUser.Firstname,foundUser.Lastname)
+	token, _, _ := helper.GenerateAllTokens(foundUser.Email, foundUser.Firstname,foundUser.Lastname,foundUser.Id)
 
 	json.NewEncoder(w).Encode(response.RegisterResponse{foundUser.Firstname, foundUser.Lastname, foundUser.Email, token})
 

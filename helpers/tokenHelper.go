@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -11,17 +12,17 @@ type SignedDetails struct {
 	Email      string
 	First_name string
 	Last_name  string
-	Uid        string
+	Uid        interface{}
 	jwt.StandardClaims
 }
 
 
-func GenerateAllTokens(email string, firstName string, lastName string) (signedToken string, signedRefreshToken string, err error) {
+func GenerateAllTokens(email string, firstName string, lastName string, uid interface{}) (signedToken string, signedRefreshToken string, err error) {
 	claims := &SignedDetails{
 		Email:      email,
 		First_name: firstName,
 		Last_name:  lastName,
-		// Uid:        uid,
+		Uid:        uid,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
 		},
@@ -42,4 +43,35 @@ func GenerateAllTokens(email string, firstName string, lastName string) (signedT
 	}
 
 	return token, refreshToken, err
+}
+
+
+func VerifyToken(signedToken string) (claims *SignedDetails, msg string){
+	token, err := jwt.ParseWithClaims(
+        signedToken,
+        &SignedDetails{},
+        func(token *jwt.Token) (interface{}, error) {
+            return []byte("secret"), nil
+        },
+    )
+
+    if err != nil {
+        msg = err.Error()
+        return
+    }
+
+	claims, ok := token.Claims.(*SignedDetails)
+    if !ok {
+        msg = fmt.Sprintf("the token is invalid")
+        msg = err.Error()
+        return
+    }
+
+    if claims.ExpiresAt < time.Now().Local().Unix() {
+        msg = fmt.Sprintf("token is expired")
+        msg = err.Error()
+        return
+    }
+
+    return claims, msg
 }
