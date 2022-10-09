@@ -20,10 +20,11 @@ func Authentication(next http.Handler) http.Handler {
 			json.NewEncoder(w).Encode("No token found")
 			return
 		}
-		claims, err := helper.VerifyToken(header)
+		claims, err := helper.VerifyToken(header) 
 
 		if err != "" {
 			json.NewEncoder(w).Encode("Invalid Authorization")
+			return
 
 			
 		}

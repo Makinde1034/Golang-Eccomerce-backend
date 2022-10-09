@@ -91,7 +91,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	token, _, _ := helper.GenerateAllTokens(newUser.Email, newUser.Firstname, newUser.Lastname,result.InsertedID)
 
-	json.NewEncoder(w).Encode(response.RegisterResponse{newUser.Firstname, newUser.Lastname, newUser.Email, token})
+	json.NewEncoder(w).Encode(response.RegisterResponse{newUser.Firstname, newUser.Lastname, newUser.Email, token,newUser.ID})
 
 	msg := helper.Email(newUser.Email)
 
@@ -125,9 +125,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, _, _ := helper.GenerateAllTokens(foundUser.Email, foundUser.Firstname,foundUser.Lastname,foundUser.Id)
+	token, _, _ := helper.GenerateAllTokens(foundUser.Email, foundUser.Firstname,foundUser.Lastname,foundUser.ID)
 
-	json.NewEncoder(w).Encode(response.RegisterResponse{foundUser.Firstname, foundUser.Lastname, foundUser.Email, token})
+	json.NewEncoder(w).Encode(response.RegisterResponse{foundUser.Firstname, foundUser.Lastname, foundUser.Email, token,foundUser.ID})
 
 	fmt.Println(foundUser)
 }

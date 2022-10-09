@@ -11,6 +11,6 @@ func CreateStroe(w http.ResponseWriter, r *http.Request) {
 	userId,ok := r.Context().Value("result").(string)
 
 	if ok {
-		fmt.Println(userId)
+		fmt.Println(userId,"herrrrre")
 	}
 }
