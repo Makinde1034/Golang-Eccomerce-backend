@@ -10,5 +10,5 @@ type User struct {
 	Email     string `json:"email" validate:"email,required"`
 	Password  string `json:"password" validate:"required"`
 	Verified  bool
-	ID        primitive.ObjectID `bson:"_id"`
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
 }

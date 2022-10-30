@@ -9,7 +9,7 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-func googleAuthSetup() *oauth2.Config{
+func GoogleAuthSetup() *oauth2.Config{
 
 	err := godotenv.Load(".env")
 
@@ -17,10 +17,12 @@ func googleAuthSetup() *oauth2.Config{
 		log.Panic("An error occured while loading env file")
 	}
 
+
+
 	conf := &oauth2.Config{
 		ClientID:    os.Getenv("googleClientId"),
 		ClientSecret: os.Getenv(("googleClientSecret")),
-		RedirectURL:  "YOUR_REDIRECT_URL",
+		RedirectURL:  "https://localhost:8000/google/googlecallback",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/bigquery",
 			"https://www.googleapis.com/auth/blogger",

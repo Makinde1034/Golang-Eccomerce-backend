@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"music-app-backend/configs"
 	"music-app-backend/models"
@@ -20,6 +21,7 @@ import (
 
 type er struct {
 	Msg string `json:"msg"`
+	Ok string `json:"ok"`
 }
 
 var validate = validator.New()
@@ -47,7 +49,15 @@ func verifyPassword(userPassword string, providedPassword string) (bool, string)
 	return check, msg
 }
 
+func JSONError(w http.ResponseWriter, err interface{}, code int) {
+    w.Header().Set("Content-Type", "application/json; charset=utf-8")
+    w.Header().Set("X-Content-Type-Options", "nosniff")
+    w.WriteHeader(code)
+    json.NewEncoder(w).Encode(err)
+}
+
 func Register(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var newUser models.User
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -62,6 +72,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(newUser.Password) < 5  {
+		JSONError(w, er{"Password is too short","failed"},400)
+
+		return
+	}
+
 	userCollection := configs.OpenCollection(configs.DB, "user")
 
 	count, err := userCollection.CountDocuments(ctx, bson.M{"email": newUser.Email})
@@ -71,7 +87,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		json.NewEncoder(w).Encode(er{"User already exists."})
+		// json.NewEncoder(w).Encode(er{"User already exists."})
+		JSONError(w, er{"User already exists","failed"},400)
 		return
 	}
 
@@ -87,11 +104,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 
 	if err != nil {
-		json.NewEncoder(w).Encode(er{"An error occured"})
+		// json.NewEncoder(w).Encode(er{"An error occured"})
+		log.Fatal(err)
+		return
 	}
+	
 	token, _, _ := helper.GenerateAllTokens(newUser.Email, newUser.Firstname, newUser.Lastname,result.InsertedID)
 
-	json.NewEncoder(w).Encode(response.RegisterResponse{newUser.Firstname, newUser.Lastname, newUser.Email, token,newUser.ID})
+	json.NewEncoder(w).Encode(response.RegisterResponse{newUser.Firstname, newUser.Lastname, newUser.Email, token,result.InsertedID})
 
 	msg := helper.Email(newUser.Email)
 
@@ -99,7 +119,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request) {     
 	var user models.User
 	var foundUser models.User
 
@@ -113,7 +133,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := userCollection.FindOne(ctx, bson.D{{"email", user.Email}}).Decode(&foundUser)
 
 	if err != nil {
-		json.NewEncoder(w).Encode(er{"Incorrect Eemail or password"})
+		// json.NewEncoder(w).Encode(er{"Incorrect Eemail or password"})
 		fmt.Println(err)
 		return
 	}
@@ -130,4 +150,48 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response.RegisterResponse{foundUser.Firstname, foundUser.Lastname, foundUser.Email, token,foundUser.ID})
 
 	fmt.Println(foundUser)
+}
+
+
+func GoogleAuthentication(w http.ResponseWriter, r *http.Request) {
+	googleConfig := configs.GoogleAuthSetup()
+	URL := googleConfig.AuthCodeURL("randomState")
+
+	// redirect to google login page
+	http.Redirect(w,r,URL, http.StatusSeeOther)
+}
+
+func GoogleCallback(w http.ResponseWriter, r *http.Request){
+	state:= r.URL.Query()["state"][0]
+	if state != "randomState" {
+		fmt.Println("state do not match")
+		return
+	}
+
+	code := r.URL.Query()["code"][0]
+
+	googleConfig := configs.GoogleAuthSetup()
+
+	token,err := googleConfig.Exchange(context.Background(),code)
+
+	if err != nil {
+		fmt.Println("code exchange failed")
+	}
+
+	//fetch user details from google API
+	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+
+	if err != nil {
+		fmt.Println("Err while fetching user details")
+	}
+
+	// PARSE USER DATA AS JSON
+
+	userData,err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		fmt.Println("Error while parsing")
+	}
+
+	fmt.Print(string(userData))
 }

@@ -23,9 +23,12 @@ func main() {
 	secure.Use(middlewares.Authentication)
 	mux.HandleFunc("/register", controllers.Register).Methods("POST")
 	mux.HandleFunc("/login", controllers.Login).Methods("POST")
+	mux.HandleFunc("/googleAuth", controllers.GoogleAuthentication).Methods("GET")
+	mux.HandleFunc("/google/googlecallback", controllers.GoogleCallback).Methods("GET")
+	mux.HandleFunc("/get-stores", controllers.GetStores).Methods("GET")
 
 
-	secure.HandleFunc("/test", controllers.CreateStroe).Methods("GET")
+	secure.HandleFunc("/ccreate-store", controllers.CreateStore).Methods("POST")
 
 	http.ListenAndServe(":8000", mux)
 
