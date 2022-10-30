@@ -1,49 +1,36 @@
 package helper
 
 import (
-	// "net/http"
 	"fmt"
-	"log"
 	"net/smtp"
-	"os"
-
-	"github.com/joho/godotenv"
-	// "go.mongodb.org/mongo-driver/mongo/address"
-	// "golang.org/x/text/message"
 )
 
-func Email(reciever string) string{
+// "net/http"
 
-	msg := ""
+// "os"
+// "github.com/joho/godotenv"
+// "go.mongodb.org/mongo-driver/mongo/address"
+// "golang.org/x/text/message"
+
+
+func Email(body string) string{
+
+	response := ""
+
 	
 
-	err := godotenv.Load(".env")
+	msg := "Subject : Verification\n my email body"
+
+	auth := smtp.PlainAuth("","makinde1034@gmail.com","jmlgqmlzabktgcbp","smtp.gmail.com")
+
+	err := smtp.SendMail("smtp.gmail.com:587",auth,"makinde1034@gmail.com",[]string{"makinde1034@gmail.com"},[]byte(msg))
 
 	if err != nil {
-		log.Panic(err)
+		fmt.Println(err)
+		return "An error occured"
 	}
+	response = "email sent"
+	return  response
 
-	fromEmail := os.Getenv("fromEmail")
-	password := os.Getenv("password")
-	toEmail := []string{reciever}
-	host := "smtp.gmail.com"
-	port := "587"
-	address := host+":"+port
-	subject := "Please verify your account"
-	body := "First email"
-	message := []byte(subject + body)
-	auth := smtp.PlainAuth("",fromEmail,password,host)
 
-	_err := smtp.SendMail(address,auth,fromEmail,toEmail,message)
-
-	if _err != nil {
-		fmt.Println(_err)
-		msg = "Somthing went wrong."
-		return msg
-	}
-	msg = "Email sent successfully"
-
-	return msg
-
-	
 }
