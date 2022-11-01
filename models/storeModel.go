@@ -13,10 +13,13 @@ type item struct {
 
 type Store struct {
 	Name        string             `json:"name"`
-	Created     time.Time             `json:"created"`
+	Created     time.Time          `json:"created"`
 	Description string             `json:"description"`
-	Category string `json:"category"`
-	Owner        string `json:"owner"`
-	Orders  string `json:"orders"`
-	Products []item `json:"products"`
+	Category    string             `json:"category"`
+	Owner       string             `json:"owner"`
+	Orders      string             `json:"orders"`
+	Products    []item             `json:"products"`
+	Image       string             `json:"image"`
+	PhoneNumber string             `json:"phoneNumber"`
+	Whatsapp    string             `json:"whatsapp"`
 }

@@ -22,6 +22,7 @@ import (
 type er struct {
 	Msg string `json:"msg"`
 	Ok string `json:"ok"`
+	
 }
 
 var validate = validator.New()
@@ -108,7 +109,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 		return
 	}
-	
+
 	token, _, _ := helper.GenerateAllTokens(newUser.Email, newUser.Firstname, newUser.Lastname,result.InsertedID)
 
 	json.NewEncoder(w).Encode(response.RegisterResponse{newUser.Firstname, newUser.Lastname, newUser.Email, token,result.InsertedID})
@@ -119,7 +120,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {     
+func Login(w http.ResponseWriter, r *http.Request) {   
+	w.Header().Set("Access-Control-Allow-Origin", "*")  
 	var user models.User
 	var foundUser models.User
 
@@ -133,7 +135,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := userCollection.FindOne(ctx, bson.D{{"email", user.Email}}).Decode(&foundUser)
 
 	if err != nil {
-		// json.NewEncoder(w).Encode(er{"Incorrect Eemail or password"})
+		json.NewEncoder(w).Encode(er{"Incorrect Email or password","failed"})
 		fmt.Println(err)
 		return
 	}
@@ -141,7 +143,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	passwordValid, msg := verifyPassword(user.Password, foundUser.Password)
 
 	if passwordValid != true {
-		json.NewEncoder(w).Encode(er{Msg: msg})
+		// json.NewEncoder(w).Encode(er{Msg: msg})
+		JSONError(w,er{Msg: msg,Ok:"failed"},403)
 		return
 	}
 

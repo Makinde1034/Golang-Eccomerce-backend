@@ -26,6 +26,7 @@ func main() {
 	mux.HandleFunc("/googleAuth", controllers.GoogleAuthentication).Methods("GET")
 	mux.HandleFunc("/google/googlecallback", controllers.GoogleCallback).Methods("GET")
 	mux.HandleFunc("/get-stores", controllers.GetStores).Methods("GET")
+	mux.HandleFunc("/image-uploads", controllers.ImageUpload).Methods("POST")
 
 
 	secure.HandleFunc("/ccreate-store", controllers.CreateStore).Methods("POST")

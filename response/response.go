@@ -10,5 +10,5 @@ type RegisterResponse struct {
 
 type Error struct {
 	Msg string `json:"msg"`
-	Ok string `json:"ok"`
+	Ok string `json:"ok"`  
 }
