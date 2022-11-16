@@ -10,12 +10,18 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
 
 	
 	configs.ConnectDB()
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
 
 	mux := mux.NewRouter()
 	// create subrouter to check token status
@@ -28,10 +34,11 @@ func main() {
 	mux.HandleFunc("/get-stores", controllers.GetStores).Methods("GET")
 	mux.HandleFunc("/image-uploads", controllers.ImageUpload).Methods("POST")
 
-
+	// secure routess
+	secure.HandleFunc("/upload-product",controllers.AddProductToStore).Methods("POST")
 	secure.HandleFunc("/ccreate-store", controllers.CreateStore).Methods("POST")
 
-	http.ListenAndServe(":8000", mux)
+	http.ListenAndServe(":8000", c.Handler(mux))
 
 	fmt.Println("listening")
 	

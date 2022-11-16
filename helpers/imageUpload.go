@@ -12,7 +12,7 @@ import (
 )
 
 func UploadImage(input interface{})(string, error){
-	ctx, cancel := context.WithTimeout(context.Background(),10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(),20*time.Second)
 	defer cancel()
 	err := godotenv.Load()
 

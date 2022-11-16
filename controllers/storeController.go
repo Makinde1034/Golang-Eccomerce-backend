@@ -31,14 +31,14 @@ func CreateStore(w http.ResponseWriter, r *http.Request) {
 	formfile, _, err := r.FormFile("file")
 
 	if(err !=nil){
-		json.NewEncoder(w).Encode(response.Error{"failed","failed"})
+		json.NewEncoder(w).Encode(response.Error{"failed",false})
 		return
 	}
 
 	url, err := helper.UploadImage(formfile)
 
 	if err != nil {
-		json.NewEncoder(w).Encode(response.Error{"failed to upload image","failed"})
+		json.NewEncoder(w).Encode(response.Error{"failed to upload image",false})
 		fmt.Println(err)
 		return
 	}
@@ -81,7 +81,7 @@ func GetStores(w http.ResponseWriter, r *http.Request){
 	cur,err := storeCollection.Find(context.Background(),bson.D{{}})
 
 	if err != nil {
-		json.NewEncoder(w).Encode(response.Error{"Failed to load stores","failed"})
+		json.NewEncoder(w).Encode(response.Error{"Failed to load stores",false})
 		return
 	}
 
@@ -145,7 +145,7 @@ func ImageUpload(w http.ResponseWriter, r *http.Request){
 		  	url, err := helper.UploadImage(reader)
 
 			if err != nil {
-				json.NewEncoder(w).Encode(response.Error{"failed to upload image","failed"})
+				json.NewEncoder(w).Encode(response.Error{"failed to upload image",false})
 				fmt.Println(err)
 				return
 			}
@@ -174,4 +174,5 @@ func ImageUpload(w http.ResponseWriter, r *http.Request){
 	// }
 
 	// json.NewEncoder(w).Encode(url)
+
 }

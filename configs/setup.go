@@ -24,12 +24,6 @@ func ConnectDB()  *mongo.Client {
 		log.Fatal(err)
 	}
 
-	// defer func() {
-	// 	if err = client.Disconnect(context.TODO()); err != nil {
-	// 		panic(err)
-	// 	}
-	// }()
-
 	err = client.Ping(ctx, readpref.Primary())
 
 	if err != nil {
@@ -38,13 +32,6 @@ func ConnectDB()  *mongo.Client {
 
 	fmt.Print("connected to mdb")
 
-	// databases, err := client.ListDatabaseNames(ctx, bson.M{})
-
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Println(databases)
 	return client
 }
 
